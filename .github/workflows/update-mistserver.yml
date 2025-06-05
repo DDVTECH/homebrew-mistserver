@@ -1,0 +1,44 @@
+name: Update MistServer Formula
+
+# Trigger refresh of mistserver formula
+on:
+  # schedule:
+  #   - cron: '0 2 * * *'  # Daily at 02:00 UTC
+  workflow_dispatch:    # manual trigger via GitHub Actions-tab
+  # repository_dispatch:  # for triggers from other workflows
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Tap-repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history needed for commits
+
+      - name: Setup Homebrew (needed for shasum etc.)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential curl
+
+      - name: Run bump script
+        run: |
+          bash scripts/bump-mistserver.sh
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and push changes
+        run: |
+          if [ -n "$(git diff)" ]; then
+            git add Formula/mistserver.rb
+            git commit -m "Auto-update MistServer to $(grep '^  version' Formula/mistserver.rb | awk '{print $2}' | tr -d '\"')"
+            git push origin HEAD:main
+          else
+            echo "No changes; formula is already up-to-date."
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
