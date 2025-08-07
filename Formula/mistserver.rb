@@ -1,50 +1,42 @@
 class Mistserver < Formula
   desc "Next-generation streaming media server"
   homepage "https://mistserver.org"
-  url "https://github.com/DDVTECH/mistserver/archive/refs/tags/3.6.1.tar.gz"
-  version "3.6.1"
-  sha256 "e3c330d5bb57c183954ff9c46225c2511f80332b912727ca29963ec3d2055f11"
+  url "https://github.com/DDVTECH/mistserver/archive/refs/tags/3.8.tar.gz"
+  version "3.8"
+  sha256 "11fdb2a810fe20b0292fde1569382a54ccce054077b5dd9efb2b71eae88ddcaf"
   license "Unlicense"
 
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build
+  depends_on "cmake" => :build
 
-  # Core dependencies
+  # Core dependencies - same approach as ffmpeg
+  depends_on "srt"
   depends_on "srtp"
-  depends_on "srt" => :optional
+  depends_on "mbedtls"
+  depends_on "libusrsctp"
 
   def install
-    # Create a native file to override problematic dependency detection
-    (buildpath/"native_file.ini").write <<~EOS
-      [binaries]
-
-      [properties]
-      # Force mbedtls to not be found, so fallback subproject is used
-      mbedtls = 'false'
-      mbedx509 = 'false'
-      mbedcrypto = 'false'
-    EOS
-
     mkdir "build" do
-      # Allow fallback dependencies since MistServer is designed to use them
-      meson_args = std_meson_args.reject { |arg| arg.include?("wrap-mode") }
-      meson_args += [
-        "--wrap-mode=default",
-        "--native-file=../native_file.ini",
-        "-DNOUPDATE=true",
-        "-DNORIST=true"
-      ]
+      # Fix Homebrew's broken build environment
+      cmake_formula = Formula["cmake"]
+      ENV["CMAKE"] = cmake_formula.opt_bin/"cmake"
+      ENV["PATH"] = "#{cmake_formula.opt_bin}:#{ENV["PATH"]}"
 
-      system "meson", "setup", *meson_args, ".."
+      # Use standard Homebrew meson args - all dependencies from system packages
+      system "meson", "setup", *std_meson_args, "-DNOUPDATE=true", "-DNORIST=true", ".."
       system "ninja"
       system "ninja", "install"
     end
 
-    # Meson installed all Mist*-binaries under bin/
-    # Leave them there and make one extra symlink for 'mistserver'.
-    # MistController is the main controller binary.
-    bin.install_symlink "MistController" => "mistserver"
+    # Create a wrapper script instead of a symlink so MistController can find other binaries
+    # MistController scans its own directory for Mist* binaries on startup
+    (bin/"mistserver").write <<~EOS
+      #!/bin/bash
+      cd "#{bin}" && exec ./MistController "$@"
+    EOS
+    chmod 0755, bin/"mistserver"
   end
 
   service do

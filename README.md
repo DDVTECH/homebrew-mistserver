@@ -74,6 +74,7 @@ https://docs.mistserver.org
 ```
 
 brew install meson ninja pkg-config
+brew install --build-from-source ./Formula/mistserver.rb
 
 ```
 - Inspect runtime errors by tailing the logs:
