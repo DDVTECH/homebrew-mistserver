@@ -43,8 +43,8 @@ class Mistserver < Formula
     run [opt_bin/"mistserver"]
     keep_alive true
     working_dir var
-    log_path var/"log/mistserver.log"
-    error_log_path var/"log/mistserver.err.log"
+    log_path var/"log/mistserver/mistserver.log"
+    error_log_path var/"log/mistserver/mistserver.err.log"
   end
 
   def caveats

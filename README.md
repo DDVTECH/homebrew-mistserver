@@ -58,8 +58,8 @@ brew upgrade mistserver
 - Logs live at:
 ```
 
-\~/Library/Logs/mistserver.log
-\~/Library/Logs/mistserver.err.log
+Intel macs: `/usr/local/var/log/mistserver/mistserver.log`
+Apple Silicon: `/opt/homebrew/var/log/mistserver/mistserver.log`
 
 ```
 - Default data/config directories are under:
