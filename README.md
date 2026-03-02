@@ -1,85 +1,57 @@
-
 # homebrew-mistserver
-Homebrew formula for building and installing MistServer from source.
 
-## URLs
-- MistServer homepage: https://mistserver.org
-- MistServer GitHub: https://github.com/DDVTECH/mistserver
-- Official docs: https://docs.mistserver.org
+Homebrew tap for [MistServer](https://mistserver.org) and [MistTray](https://github.com/DDVTECH/MistMacTray).
 
 ## Installation
-1. Tap this repo:
-```
 
+```bash
 brew tap ddvtech/mistserver
-
-```
-(This resolves to `DDVTECH/homebrew-mistserver`.)
-
-2. Install MistServer:
-```
-
 brew install mistserver
-
 ```
 
-## Background Service
-To run MistServer as a launchd daemon and have it restart at login:
+Optionally install the macOS menu bar app:
+
+```bash
+brew install --cask misttray
 ```
 
+## Usage
+
+Start as a background service:
+
+```bash
 brew services start mistserver
-
-```
-To stop:
 ```
 
+Then open http://localhost:4242 in your browser.
+
+Stop:
+
+```bash
 brew services stop mistserver
-
 ```
 
-## How It Works
-- The formula downloads the MistServer source tarball, verifies its SHA256, and builds with Meson/Ninja.
-- After building, it installs the `mistserver` binary (renamed from `MistController`) into your Homebrew bin.
-- A built-in `service do` block generates a launchd plist so `brew services` can manage it.
+Or run in the foreground:
+
+```bash
+mistserver
+```
 
 ## Upgrade
-When a new MistServer version is released:
-1. Update `url`, `version`, and `sha256` in `Formula/mistserver.rb`.
-2. Commit and push.
-3. Users run:
-```
 
+```bash
 brew update
 brew upgrade mistserver
-
 ```
 
-## Logs & Configuration
-- Logs live at:
+## Logs
+
+```bash
+tail -f $(brew --prefix)/var/log/mistserver/mistserver.log
 ```
 
-Intel macs: `/usr/local/var/log/mistserver/mistserver.log`
-Apple Silicon: `/opt/homebrew/var/log/mistserver/mistserver.log`
+## Links
 
-```
-- Default data/config directories are under:
-- Intel macs: `/usr/local/var/mistserver/`
-- Apple Silicon: `/opt/homebrew/var/mistserver/`
-
-Consult the official docs for configuration details:  
-https://docs.mistserver.org
-
-## Troubleshooting
-- If the build fails, ensure you have Meson, Ninja, and pkg-config installed:
-```
-
-brew install meson ninja pkg-config
-brew install --build-from-source ./Formula/mistserver.rb
-
-```
-- Inspect runtime errors by tailing the logs:
-```
-
-tail -f \~/Library/Logs/mistserver.err.log
-
-```
+- [MistServer docs](https://docs.mistserver.org)
+- [MistServer source](https://github.com/DDVTECH/mistserver)
+- [MistTray source](https://github.com/DDVTECH/MistMacTray)
