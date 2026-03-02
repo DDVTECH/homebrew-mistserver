@@ -11,10 +11,10 @@ class Mistserver < Formula
   depends_on "pkg-config" => :build
   depends_on "cmake" => :build
 
-  # Core dependencies - same approach as ffmpeg
   depends_on "srt"
   depends_on "srtp"
   depends_on "libusrsctp"
+  depends_on "ffmpeg"
 
   def install
     mkdir "build" do
@@ -25,10 +25,16 @@ class Mistserver < Formula
 
       # Allow meson to use subproject fallbacks (bundled mbedtls 3.6.x instead of Homebrew's incompatible 4.0)
       meson_args = std_meson_args.reject { |arg| arg.include?("wrap-mode") }
-      meson_args += ["--wrap-mode=default", "-DNOUPDATE=true", "-DNORIST=true"]
+      meson_args += [
+        "--wrap-mode=default",
+        "-DNOUPDATE=true",
+        "-DNORIST=true",
+        "-DWITH_AV=true",
+        "-Dmbedtls:default_library=static",
+      ]
       system "meson", "setup", *meson_args, ".."
       system "ninja"
-      system "ninja", "install"
+      system "meson", "install", "--skip-subprojects"
     end
 
     # Create a wrapper script instead of a symlink so MistController can find other binaries
