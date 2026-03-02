@@ -14,7 +14,6 @@ class Mistserver < Formula
   # Core dependencies - same approach as ffmpeg
   depends_on "srt"
   depends_on "srtp"
-  depends_on "mbedtls"
   depends_on "libusrsctp"
 
   def install
@@ -24,8 +23,10 @@ class Mistserver < Formula
       ENV["CMAKE"] = cmake_formula.opt_bin/"cmake"
       ENV["PATH"] = "#{cmake_formula.opt_bin}:#{ENV["PATH"]}"
 
-      # Use standard Homebrew meson args - all dependencies from system packages
-      system "meson", "setup", *std_meson_args, "-DNOUPDATE=true", "-DNORIST=true", ".."
+      # Allow meson to use subproject fallbacks (bundled mbedtls 3.6.x instead of Homebrew's incompatible 4.0)
+      meson_args = std_meson_args.reject { |arg| arg.include?("wrap-mode") }
+      meson_args += ["--wrap-mode=default", "-DNOUPDATE=true", "-DNORIST=true"]
+      system "meson", "setup", *meson_args, ".."
       system "ninja"
       system "ninja", "install"
     end
