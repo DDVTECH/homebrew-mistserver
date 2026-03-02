@@ -17,6 +17,11 @@ class Mistserver < Formula
   depends_on "ffmpeg"
 
   def install
+    # Force bundled mbedtls subproject (Homebrew's mbedtls 4.0+ is incompatible)
+    inreplace "meson.build",
+      "have_upstream_mbedtls_srtp = ccpp.compiles(code_upstream, dependencies: [mbedtls, mbedx509, mbedcrypto], name: 'MbedTLS SRTP is upstream')",
+      "have_upstream_mbedtls_srtp = false"
+
     mkdir "build" do
       # Fix Homebrew's broken build environment
       cmake_formula = Formula["cmake"]
