@@ -1,6 +1,8 @@
 name: Update MistServer Formula
 
 on:
+  repository_dispatch:
+    types: [mistserver-release]
   workflow_dispatch:
 
 jobs:
