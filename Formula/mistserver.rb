@@ -32,6 +32,7 @@ class Mistserver < Formula
       meson_args = std_meson_args.reject { |arg| arg.include?("wrap-mode") }
       meson_args += [
         "--wrap-mode=default",
+        "-DVERSION=#{version}",
         "-DNOUPDATE=true",
         "-DNORIST=true",
         "-DWITH_AV=true",
