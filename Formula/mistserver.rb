@@ -61,8 +61,11 @@ class Mistserver < Formula
 
       To run MistServer manually in the foreground:
         mistserver
-        
+
       The web interface will be available at http://localhost:4242
+
+      For a system tray interface to manage MistServer:
+        brew install --cask ddvtech/mistserver/misttray
     EOS
   end
 
