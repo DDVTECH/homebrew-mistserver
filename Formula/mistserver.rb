@@ -13,30 +13,24 @@ class Mistserver < Formula
 
   depends_on "srt"
   depends_on "srtp"
-  depends_on "libusrsctp"
   depends_on "ffmpeg"
 
   def install
-    # Force bundled mbedtls subproject (Homebrew's mbedtls 4.0+ is incompatible)
-    inreplace "meson.build",
-      "have_upstream_mbedtls_srtp = ccpp.compiles(code_upstream, dependencies: [mbedtls, mbedx509, mbedcrypto], name: 'MbedTLS SRTP is upstream')",
-      "have_upstream_mbedtls_srtp = false"
-
     mkdir "build" do
-      # Fix Homebrew's broken build environment
       cmake_formula = Formula["cmake"]
       ENV["CMAKE"] = cmake_formula.opt_bin/"cmake"
       ENV["PATH"] = "#{cmake_formula.opt_bin}:#{ENV["PATH"]}"
 
-      # Allow meson to use subproject fallbacks (bundled mbedtls 3.6.x instead of Homebrew's incompatible 4.0)
       meson_args = std_meson_args.reject { |arg| arg.include?("wrap-mode") }
       meson_args += [
         "--wrap-mode=default",
+        "--force-fallback-for=mbedtls,usrsctp",
         "-DVERSION=#{version}",
         "-DNOUPDATE=true",
         "-DNORIST=true",
         "-DWITH_AV=true",
         "-Dmbedtls:default_library=static",
+        "-Dusrsctp:default_library=static",
       ]
       system "meson", "setup", *meson_args, ".."
       system "ninja"
