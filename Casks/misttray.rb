@@ -14,6 +14,10 @@ cask "misttray" do
 
   app "MistTray.app"
 
+  postflight do
+    system "open", "#{appdir}/MistTray.app"
+  end
+
   zap trash: [
     "~/Library/Application Support/MistTray",
     "~/Library/Preferences/com.ddvtech.MistTray.plist",
