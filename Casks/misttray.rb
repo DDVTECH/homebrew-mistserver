@@ -1,6 +1,6 @@
 cask "misttray" do
-  version "0.2.2"
-  sha256 "5c1491f132c639ff9156cc041b3e59deb81e2e0c0206a30a323cde6ce42a877d"
+  version "0.2.3"
+  sha256 "d75685b49f846eccc83574bd290aac7f01bb046683d0e108a9939d939ecc9a4c"
   
   url "https://github.com/DDVTECH/MistMacTray/releases/download/v#{version}/MistTray-v#{version}.zip"
   name "MistTray"
