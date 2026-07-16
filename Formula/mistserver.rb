@@ -1,9 +1,9 @@
 class Mistserver < Formula
   desc "Next-generation streaming media server"
   homepage "https://mistserver.org"
-  url "https://github.com/DDVTECH/mistserver/archive/refs/tags/3.11.tar.gz"
-  version "3.11"
-  sha256 "bf982b8f11d8bdec1e543d347db733340d171206c0c86a60775f9021c5ee4ea6"
+  url "https://github.com/DDVTECH/mistserver/archive/refs/tags/3.11.1.tar.gz"
+  version "3.11.1"
+  sha256 "8dc2d61a1c086d2a7bfb77592e4ffb425279abe782e15896b1a6d74c54c99853"
   license "Unlicense"
 
   depends_on "meson" => :build
