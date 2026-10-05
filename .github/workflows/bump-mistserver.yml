@@ -1,0 +1,57 @@
+name: Bump MistServer Source Formula
+
+on:
+  workflow_call:
+    inputs:
+      source:
+        required: true
+        type: string
+      tag:
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: write
+
+# Serialize formula writes without allowing nightly to discard a pending tag run.
+concurrency:
+  group: mistserver-formula
+  cancel-in-progress: false
+  queue: max
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Run shared bump script
+        env:
+          SOURCE: ${{ inputs.source }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          case "$SOURCE" in
+            release) bash scripts/bump-mistserver.sh ;;
+            tag)
+              test -n "$TAG" || { echo 'A tag update requires an exact release tag'; exit 1; }
+              bash scripts/bump-mistserver.sh "$TAG"
+              ;;
+            *) echo "Unknown formula source: $SOURCE"; exit 1 ;;
+          esac
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet -- Formula/mistserver.rb; then
+            VERSION=$(awk '/^  version / {gsub(/"/, "", $2); print $2}' Formula/mistserver.rb)
+            git add Formula/mistserver.rb
+            git commit -m "Auto-update MistServer to $VERSION"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          else
+            echo "No changes; formula is already up-to-date."
+          fi
